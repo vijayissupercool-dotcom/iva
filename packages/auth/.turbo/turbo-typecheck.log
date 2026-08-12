@@ -1,0 +1,4 @@
+
+> @lva/auth@0.1.0 typecheck /Users/dev/Desktop/Restage/lva/packages/auth
+> tsc --noEmit
+

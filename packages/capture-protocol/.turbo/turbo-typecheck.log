@@ -1,0 +1,4 @@
+
+> @lva/capture-protocol@0.1.0 typecheck /Users/dev/Desktop/Restage/lva/packages/capture-protocol
+> tsc --noEmit
+

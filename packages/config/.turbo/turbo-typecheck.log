@@ -1,0 +1,4 @@
+
+> @lva/config@0.1.0 typecheck /Users/dev/Desktop/Restage/lva/packages/config
+> tsc --noEmit
+

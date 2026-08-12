@@ -1,0 +1,4 @@
+
+> @lva/ai@0.1.0 typecheck /Users/dev/Desktop/Restage/lva/packages/ai
+> tsc --noEmit
+

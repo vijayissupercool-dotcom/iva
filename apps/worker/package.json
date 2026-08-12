@@ -1,0 +1,20 @@
+{
+  "name": "@lva/worker",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "bullmq": "^5.0.0",
+    "fastify": "^4.26.0",
+    "ioredis": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,4 @@
+
+> @lva/media@0.1.0 typecheck /Users/dev/Desktop/Restage/lva/packages/media
+> tsc --noEmit
+
