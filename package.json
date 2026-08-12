@@ -9,8 +9,11 @@
     "test": "turbo run test"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^9",
     "turbo": "latest",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.67.0"
   },
   "packageManager": "pnpm@9.0.0"
 }
