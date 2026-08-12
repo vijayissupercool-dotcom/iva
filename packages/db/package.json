@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "main": "src/index.ts",
   "scripts": {
+    "postinstall": "prisma generate",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit"
   },
