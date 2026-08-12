@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout -1
+spawn pnpm --filter @lva/db exec prisma migrate dev --name phase_2_schema
+expect "Are you sure you want to create and apply this migration?"
+send "y\r"
+expect eof

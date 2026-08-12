@@ -7,164 +7,231 @@ generator client {
 }
 
 model Workspace {
-  id          String   @id @default(cuid())
+  id          String            @id @default(cuid())
   name        String
-  slug        String   @unique
-  plan        Plan     @default(FREE)
-  createdAt   DateTime @default(now())
+  slug        String            @unique
+  plan        Plan              @default(FREE)
+  createdAt   DateTime          @default(now())
   members     WorkspaceMember[]
   projects    Project[]
   usageEvents UsageEvent[]
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
+  id          String            @id @default(cuid())
+  email       String            @unique
+  name        String?
+  createdAt   DateTime          @default(now())
   memberships WorkspaceMember[]
 }
 
 model WorkspaceMember {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   workspaceId String
   userId      String
   role        MemberRole @default(EDITOR)
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  user        User      @relation(fields: [userId], references: [id])
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+
   @@unique([workspaceId, userId])
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  workspaceId String
-  name        String
+  id           String    @id @default(cuid())
+  workspaceId  String
+  name         String
   sourceAppUrl String?
-  createdAt   DateTime @default(now())
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  videos      Video[]
+  createdAt    DateTime  @default(now())
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+  videos       Video[]
 }
 
 model Video {
-  id                  String   @id @default(cuid())
-  workspaceId         String
-  projectId           String
-  title               String
-  slug                String   @unique
-  status              VideoStatus @default(DRAFT)
-  publishedVersionId  String?
-  sourceAppUrl        String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  archivedAt          DateTime?
-  project             Project @relation(fields: [projectId], references: [id])
-  versions            VideoVersion[]
-  segments            Segment[]
-  scanRuns            ScanRun[]
+  id                 String         @id @default(cuid())
+  workspaceId        String
+  projectId          String
+  title              String
+  slug               String         @unique
+  status             VideoStatus    @default(DRAFT)
+  publishedVersionId String?
+  sourceAppUrl       String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  archivedAt         DateTime?
+  project            Project        @relation(fields: [projectId], references: [id])
+  versions           VideoVersion[]
+  segments           Segment[]
+  scanRuns           ScanRun[]
+  shares             Share[]
 }
 
 model VideoVersion {
-  id            String   @id @default(cuid())
-  videoId       String
-  versionNumber Int
-  status        VersionStatus @default(DRAFT)
-  createdBy     String
-  changeSummary String?
+  id              String           @id @default(cuid())
+  videoId         String
+  versionNumber   Int
+  status          VersionStatus    @default(DRAFT)
+  createdBy       String
+  changeSummary   String?
   renderedAssetId String?
-  createdAt     DateTime @default(now())
-  publishedAt   DateTime?
-  video         Video @relation(fields: [videoId], references: [id])
+  createdAt       DateTime         @default(now())
+  publishedAt     DateTime?
+  video           Video            @relation(fields: [videoId], references: [id])
   segmentVersions SegmentVersion[]
+
   @@unique([videoId, versionNumber])
 }
 
 model Segment {
-  id         String   @id @default(cuid())
-  videoId    String
-  stableKey  String   // survives across versions; identity of "this step" over time
-  ordinal    Int
-  title      String
-  sourceUrl  String?
-  createdAt  DateTime @default(now())
-  video      Video @relation(fields: [videoId], references: [id])
-  versions   SegmentVersion[]
-  changeEvents ChangeEvent[]
+  id               String            @id @default(cuid())
+  videoId          String
+  stableKey        String // survives across versions; identity of "this step" over time
+  ordinal          Int
+  title            String
+  sourceUrl        String?
+  createdAt        DateTime          @default(now())
+  video            Video             @relation(fields: [videoId], references: [id])
+  versions         SegmentVersion[]
+  changeDetections ChangeDetection[]
+  evidences        StepEvidence[]
+
   @@unique([videoId, stableKey])
 }
 
 model SegmentVersion {
-  id                 String   @id @default(cuid())
-  segmentId          String
-  videoVersionId     String
-  videoAssetId       String
-  screenshotAssetId  String?
-  startMs            Int
-  endMs              Int
-  transcript         String?
-  selectorSignature  String?
-  domSignature       String?
-  metadataJson       Json?
-  createdAt          DateTime @default(now())
-  segment            Segment @relation(fields: [segmentId], references: [id])
-  videoVersion       VideoVersion @relation(fields: [videoVersionId], references: [id])
+  id                String       @id @default(cuid())
+  segmentId         String
+  videoVersionId    String
+  videoAssetId      String
+  screenshotAssetId String?
+  startMs           Int
+  endMs             Int
+  transcript        String?
+  selectorSignature String?
+  domSignature      String?
+  metadataJson      Json?
+  createdAt         DateTime     @default(now())
+  segment           Segment      @relation(fields: [segmentId], references: [id])
+  videoVersion      VideoVersion @relation(fields: [videoVersionId], references: [id])
 }
 
 model Asset {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   workspaceId String
-  kind        AssetKind   // RAW_VIDEO | SEGMENT_VIDEO | SCREENSHOT | THUMBNAIL | RENDERED_VERSION | AUDIO
+  kind        AssetKind // RAW_VIDEO | SEGMENT_VIDEO | SCREENSHOT | THUMBNAIL | RENDERED_VERSION | AUDIO
   storageKey  String
-  contentHash String      // for dedup
+  contentHash String // for dedup
   bytes       Int
   durationMs  Int?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
+
   @@index([contentHash])
 }
 
 model RecordingSession {
-  id          String   @id @default(cuid())
-  videoId     String?  // null until first save; sessions can start before a Video row exists
-  workspaceId String
-  userId      String
-  status      SessionStatus @default(RECORDING)
-  startedAt   DateTime @default(now())
-  endedAt     DateTime?
+  id            String         @id @default(cuid())
+  videoId       String?
+  workspaceId   String
+  userId        String
+  status        SessionStatus  @default(CREATED)
+  duration      Int?
+  storageKeys   String[]
+  error         String?
+  startedAt     DateTime       @default(now())
+  endedAt       DateTime?
   captureEvents CaptureEvent[]
 }
 
 model CaptureEvent {
-  id          String   @id @default(cuid())
-  sessionId   String
-  type        String   // matches capture-protocol union tag
-  timestamp   Int      // ms since session start
-  payload     Json
-  session     RecordingSession @relation(fields: [sessionId], references: [id])
+  id             String           @id @default(cuid())
+  sessionId      String
+  type           String
+  timestamp      Int
+  url            String?
+  targetIdentity Json?
+  viewport       Json?
+  coordinates    Json?
+  metadata       Json?
+  session        RecordingSession @relation(fields: [sessionId], references: [id])
 }
 
 model ScanRun {
-  id          String   @id @default(cuid())
-  videoId     String
-  status      ScanStatus @default(RUNNING)
-  startedAt   DateTime @default(now())
-  completedAt DateTime?
-  video       Video @relation(fields: [videoId], references: [id])
-  changeEvents ChangeEvent[]
+  id               String            @id @default(cuid())
+  videoId          String
+  status           ScanStatus        @default(RUNNING)
+  startedAt        DateTime          @default(now())
+  completedAt      DateTime?
+  video            Video             @relation(fields: [videoId], references: [id])
+  changeDetections ChangeDetection[]
+  evidences        StepEvidence[]
 }
 
-model ChangeEvent {
-  id          String   @id @default(cuid())
-  videoId     String
-  segmentId   String
-  scanRunId   String
-  changeType  ChangeType   // URL | SELECTOR | DOM_SIGNATURE | TEXT | SCREENSHOT | WORKFLOW
-  severity    Severity     // COSMETIC | MATERIAL | BREAKING
-  oldValue    String?
-  newValue    String?
-  confidence  Float
-  status      ChangeStatus @default(OPEN) // OPEN | ACKNOWLEDGED | RESOLVED | IGNORED
-  createdAt   DateTime @default(now())
-  segment     Segment @relation(fields: [segmentId], references: [id])
-  scanRun     ScanRun @relation(fields: [scanRunId], references: [id])
+model ChangeDetection {
+  id                String       @id @default(cuid())
+  videoId           String
+  segmentId         String
+  baselineVersionId String
+  scanRunId         String
+  detectedAt        DateTime     @default(now())
+  confidence        Float
+  status            ChangeStatus @default(OPEN)
+  reason            String?
+  oldEvidence       Json?
+  newEvidence       Json?
+  visualDiffAssetId String?
+  domDiff           Json?
+  textDiff          Json?
+  recommendedAction String?
+  segment           Segment      @relation(fields: [segmentId], references: [id])
+  scanRun           ScanRun      @relation(fields: [scanRunId], references: [id])
+}
+
+model StepEvidence {
+  id              String   @id @default(cuid())
+  segmentId       String
+  startTime       Int
+  endTime         Int
+  screenshotKey   String?
+  targetIdentity  Json?
+  actionType      String
+  transcriptRange Json?
+  confidence      Float
+  segment         Segment  @relation(fields: [segmentId], references: [id])
+  scanRun         ScanRun? @relation(fields: [scanRunId], references: [id])
+  scanRunId       String?
+}
+
+model ProcessingJob {
+  id          String    @id @default(cuid())
+  type        String
+  entityId    String
+  status      JobStatus @default(QUEUED)
+  progress    Int       @default(0)
+  attempt     Int       @default(0)
+  error       String?
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+}
+
+model Share {
+  id         String     @id @default(cuid())
+  videoId    String
+  token      String     @unique
+  accessType AccessType @default(PUBLIC)
+  expiresAt  DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime   @default(now())
+  video      Video      @relation(fields: [videoId], references: [id])
+}
+
+model AnalyticsEvent {
+  id                String   @id @default(cuid())
+  videoId           String
+  versionId         String?
+  eventType         String
+  sessionId         String?
+  anonymousViewerId String?
+  metadata          Json?
+  timestamp         DateTime @default(now())
 }
 
 model Publish {
@@ -175,112 +242,114 @@ model Publish {
   createdAt      DateTime @default(now())
 }
 
-model ViewEvent {
-  id         String   @id @default(cuid())
-  videoId    String
-  versionId  String
-  viewerHash String?  // anonymized
-  watchedMs  Int?
-  createdAt  DateTime @default(now())
-}
-
 model AiJob {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   workspaceId String
-  type        String   // STEP_TITLE | TRANSCRIPT_CLEANUP | CHANGE_EXPLANATION | UPDATE_SUMMARY
+  type        String // STEP_TITLE | TRANSCRIPT_CLEANUP | CHANGE_EXPLANATION | UPDATE_SUMMARY
   inputRef    String
   status      JobStatus @default(QUEUED)
   outputJson  Json?
   error       String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   completedAt DateTime?
 }
 
 model UsageEvent {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   workspaceId String
-  type        String   // RECORD_MINUTE | RENDER | SCAN | STORAGE_GB
+  type        String // RECORD_MINUTE | RENDER | SCAN | STORAGE_GB
   quantity    Float
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 }
 
-enum Plan { 
-  FREE 
-  PRO 
-  TEAM 
-  ENTERPRISE 
+enum Plan {
+  FREE
+  PRO
+  TEAM
+  ENTERPRISE
 }
 
-enum MemberRole { 
-  OWNER 
-  ADMIN 
-  EDITOR 
-  VIEWER 
+enum MemberRole {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
 }
 
-enum VideoStatus { 
-  DRAFT 
-  HEALTHY 
-  NEEDS_UPDATE 
-  ARCHIVED 
+enum VideoStatus {
+  DRAFT
+  HEALTHY
+  NEEDS_UPDATE
+  ARCHIVED
 }
 
-enum VersionStatus { 
-  DRAFT 
-  RENDERING 
-  PUBLISHED 
-  FAILED 
+enum VersionStatus {
+  DRAFT
+  RENDERING
+  PUBLISHED
+  FAILED
 }
 
-enum AssetKind { 
-  RAW_VIDEO 
-  SEGMENT_VIDEO 
-  SCREENSHOT 
-  THUMBNAIL 
-  RENDERED_VERSION 
-  AUDIO 
+enum AssetKind {
+  RAW_VIDEO
+  SEGMENT_VIDEO
+  SCREENSHOT
+  THUMBNAIL
+  RENDERED_VERSION
+  AUDIO
 }
 
-enum SessionStatus { 
-  RECORDING 
-  PAUSED 
-  STOPPED 
-  UPLOADED 
-  FAILED 
+enum SessionStatus {
+  CREATED
+  RECORDING
+  STOPPING
+  UPLOADING
+  UPLOADED
+  PROCESSING
+  READY
+  FAILED
+  CANCELLED
 }
 
-enum ScanStatus { 
-  RUNNING 
-  COMPLETED 
-  FAILED 
+enum ScanStatus {
+  RUNNING
+  COMPLETED
+  FAILED
 }
 
-enum ChangeType { 
-  URL 
-  SELECTOR 
-  DOM_SIGNATURE 
-  TEXT 
-  SCREENSHOT 
-  WORKFLOW 
+enum ChangeType {
+  URL
+  SELECTOR
+  DOM_SIGNATURE
+  TEXT
+  SCREENSHOT
+  WORKFLOW
 }
 
-enum Severity { 
-  COSMETIC 
-  MATERIAL 
-  BREAKING 
+enum Severity {
+  COSMETIC
+  MATERIAL
+  BREAKING
 }
 
-enum ChangeStatus { 
-  OPEN 
-  ACKNOWLEDGED 
-  RESOLVED 
-  IGNORED 
+enum ChangeStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+  IGNORED
 }
 
-enum JobStatus { 
-  QUEUED 
-  RUNNING 
-  SUCCEEDED 
-  FAILED 
+enum JobStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+enum AccessType {
+  PUBLIC
+  PASSWORD
+  WORKSPACE_ONLY
+  EXPIRING
 }
