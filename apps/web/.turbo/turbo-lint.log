@@ -1,0 +1,10 @@
+
+> web@0.1.0 lint /Users/dev/Desktop/Restage/lva/apps/web
+> eslint
+
+
+/Users/dev/Desktop/Restage/lva/apps/web/src/app/auth/actions.ts
+  45:17  warning  'error' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 1 problem (0 errors, 1 warning)
+

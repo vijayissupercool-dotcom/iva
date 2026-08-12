@@ -2,6 +2,16 @@ import { createClient } from '@/utils/supabase/server'
 import { prisma } from '@lva/db'
 import { redirect } from 'next/navigation'
 import { signout } from '../auth/actions'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -32,11 +42,32 @@ export default async function DashboardPage() {
       <div className="max-w-4xl mx-auto">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <form action={signout}>
-            <button className="text-sm text-gray-600 hover:text-gray-900">
-              Sign out
-            </button>
-          </form>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="relative h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 overflow-hidden border-0 bg-transparent cursor-pointer p-0">
+                <Avatar>
+                  <AvatarImage src="" alt={user.email || "User"} />
+                  <AvatarFallback>{user.email?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+                </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end">
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">Account</p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user.email}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <form action={signout} className="w-full">
+                <DropdownMenuItem>
+                  <button type="submit" className="w-full text-left cursor-pointer text-red-600 outline-none">
+                    Sign out
+                  </button>
+                </DropdownMenuItem>
+              </form>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </header>
 
         <section className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">

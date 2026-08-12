@@ -1,0 +1,11 @@
+
+> @lva/worker@0.1.0 lint /Users/dev/Desktop/Restage/lva/apps/worker
+> eslint src/
+
+
+/Users/dev/Desktop/Restage/lva/apps/worker/src/index.ts
+  26:30  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+  26:39  warning  'reply' is defined but never used    @typescript-eslint/no-unused-vars
+
+✖ 2 problems (0 errors, 2 warnings)
+

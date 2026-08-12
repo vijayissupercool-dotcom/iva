@@ -1,0 +1,10 @@
+
+> @lva/auth@0.1.0 lint /Users/dev/Desktop/Restage/lva/packages/auth
+> eslint src/
+
+
+/Users/dev/Desktop/Restage/lva/packages/auth/src/index.ts
+  1:35  warning  'CookieOptions' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 1 problem (0 errors, 1 warning)
+

@@ -1,0 +1,11 @@
+
+> web@0.1.0 typecheck /Users/dev/Desktop/Restage/lva/apps/web
+> tsc --noEmit
+
+src/app/app/page.tsx(46,34): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/app/app/page.tsx(54,63): error TS2322: Type '{ children: Element[]; className: string; align: "end"; forceMount: true; }' is not assignable to type 'IntrinsicAttributes & MenuPopupProps & Pick<MenuPositionerProps, "align" | "alignOffset" | "side" | "sideOffset">'.
+  Property 'forceMount' does not exist on type 'IntrinsicAttributes & MenuPopupProps & Pick<MenuPositionerProps, "align" | "alignOffset" | "side" | "sideOffset">'.
+src/app/app/page.tsx(65,35): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & MenuItemProps & { inset?: boolean | undefined; variant?: "default" | "destructive" | undefined; }'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & MenuItemProps & { inset?: boolean | undefined; variant?: "default" | "destructive" | undefined; }'.
+ ELIFECYCLE  Command failed with exit code 2.
